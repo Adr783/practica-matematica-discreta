@@ -8,7 +8,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
-
+igig
 /*
  * Aquesta entrega consisteix en implementar tots els mètodes anomenats "exerciciX". Ara mateix la
  * seva implementació consisteix en llançar `UnsupportedOperationException`, ho heu de canviar així
