@@ -147,7 +147,25 @@ class Entrega {
      * Pista: Cercau informació sobre els nombres de Stirling.
      */
     static int exercici1(int[] a) {
-      throw new UnsupportedOperationException("pendent");
+        if(a.length==0){//Caso de conjunto vacio
+            return 1;
+        }else{
+            int sol = 0;
+            for(int i = 0; i <= a.length; i++){//bucle por número elementos del conjunto
+                sol = sol + stirling(a.length,i);
+            }
+            return sol;
+        }
+    }
+    
+    static int stirling(int x, int y){ //Calculo del numero de stirling
+        if((y == 0)){
+            return 0;
+        }else if((x == y)||(y == 1)){
+            return 1;
+        }else{
+            return y * stirling(x-1,y) + stirling(x-1,y-1);
+        }
     }
 
     /*
@@ -158,7 +176,51 @@ class Entrega {
      * Si no existeix, retornau -1.
      */
     static int exercici2(int[] a, int[][] rel) {
-      throw new UnsupportedOperationException("pendent");
+        boolean posible = true;
+        boolean reflexiva = false;
+        boolean transitiva = true;
+        int counter = 0;
+        for(int i = 0; i < a.length; i++){ //Comprueba reflexividad
+            for(int j = 0; j < rel.length; j++){
+                if(rel[j][0]==a[i]&&rel[j][1]==a[i]){
+                    reflexiva = true;
+                }
+            }
+            if(!reflexiva){
+                counter = counter + 1;
+            }
+            reflexiva = false;
+        }
+        for(int j = 0; j < rel.length; j++){//Comprueba transitividad
+            for(int k = 0; k < rel.length; k++){
+                if(rel[j][1]==rel[k][0]){
+                    transitiva = false;
+                    for(int m = 0; m < rel.length; m++){
+                        if(rel[j][0]==rel[m][0]&&rel[k][1]==rel[m][1]){
+                            transitiva = true;
+                        }
+                    }
+                }
+            }
+            if(!transitiva){
+                counter = counter + 1;
+            }
+            transitiva = true;
+        }
+        for(int j = 0; j < rel.length; j++){//Comprueba antisimetria 
+            for(int k = 0; k < rel.length; k++){
+                if(rel[j][0]==rel[k][1]&&rel[j][1]==rel[k][0]){
+                    if(!(rel[j][0]==rel[j][1])){
+                        posible = false;
+                    }
+                }
+            }
+        }
+        if(posible){
+            return counter + rel.length;
+        }else{
+            return -1;
+        }
     }
 
     /*
@@ -169,7 +231,48 @@ class Entrega {
      * - null en qualsevol altre cas
      */
     static Integer exercici3(int[] a, int[][] rel, int[] x, boolean op) {
-      throw new UnsupportedOperationException("pendent");
+        if(!op){
+            boolean isMin = true;
+            boolean isInfim = false;
+            for (int i = 0; i<rel.length; i++){
+                for(int j = 0; j<rel.length; j++){
+                   if(rel[i][1]==rel[j][0]&&rel[i][0]!=rel[i][1]){
+                       isMin = false;
+                   } 
+                }
+                if(isMin){
+                    for(int j = 0; j<x.length;j++){
+                        if(!(rel[i][0]==x[j])){
+                            isInfim = true;
+                        }
+                    }
+                }
+                if(isInfim){
+                    return rel[i][1];
+                }
+            }
+        }else{
+            boolean isMax = true;
+            boolean isSuprem = false;
+            for (int i = 0; i<rel.length; i++){
+                for(int j = 0; j<rel.length; j++){
+                   if(rel[i][0]==rel[j][1]){
+                       isMax = false;
+                   } 
+                }
+                if(isMax){
+                    for(int j = 0; j<x.length;j++){
+                        if(rel[i][1]==x[j]){
+                            isSuprem = true;
+                        }
+                    }
+                }
+                if(isSuprem){
+                    return rel[i][0];
+                }
+            }
+        }
+        return null;
     }
 
     /*
@@ -180,7 +283,59 @@ class Entrega {
      *  - Sinó, null.
      */
     static int[][] exercici4(int[] a, int[] b, Function<Integer, Integer> f) {
-      throw new UnsupportedOperationException("pendent");
+      boolean inyectiva = true;
+      boolean exaustiva = true;
+      int[] temp = new int[a.length];
+      for(int i = 1;i<a.length;i++){
+          temp[i] = f.apply(a[i]);
+      }    
+      for(int i = 0; i<temp.length;i++){
+          boolean temp1 = true;
+          for(int j = i + 1; j<temp.length;j++){
+              if(temp[i]==temp[j]){
+                  temp1 = false;
+              }
+          }
+          if(!(temp1)){
+              inyectiva = false;
+          }
+      }
+      boolean temp1 = false;
+      for(int i = 0; i<b.length;i++){
+          for(int j = i + 1; j<temp.length;j++){
+              if(b[i]==temp[j]){
+                  temp1 = true;
+              }
+          }
+        if(!(temp1)){
+            exaustiva = false;
+        }
+      }
+      if(exaustiva && inyectiva){
+          int[][]grafoInvertido = new int[a.length][2];
+          for(int i = 0; i<grafoInvertido.length;i++){
+              grafoInvertido[i][0] = temp[i];
+              grafoInvertido[i][1] = a[i];
+          }
+          return grafoInvertido;
+      }
+      if(inyectiva){
+          int[][]grafoInvertido = new int[b.length][2];
+          for(int i = 0; i<grafoInvertido.length;i++){
+              grafoInvertido[i][0] = b[i];
+              grafoInvertido[i][1] = b[i]; //Función contraria a x -> x
+          }
+          return grafoInvertido;
+      }
+      if(exaustiva){
+          int[][]grafoInvertido = new int[b.length][2];
+          for(int i = 0; i<grafoInvertido.length;i++){
+              grafoInvertido[i][0] = b[i];
+              grafoInvertido[i][1] = b[i]*2; //Función contraria a x -> x/2
+          }
+          return grafoInvertido;
+      }
+      return null;
     }
 
     /*
