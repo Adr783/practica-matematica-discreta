@@ -49,7 +49,7 @@ import java.util.stream.IntStream;
  * de texte estigui configurat amb codificació UTF-8.
  */
 class Entrega {
-  static final String[] NOMS = {};
+  static final String[] NOMS = {Adrián Gozález Alcalá, Adrián Javier Ballesteros Romero, Adrián Reina Sorribas};
 
   /*
    * Aquí teniu els exercicis del Tema 1 (Lògica).
