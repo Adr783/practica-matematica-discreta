@@ -79,7 +79,68 @@ class Entrega {
     static final char NAND = '.';
 
     static int exercici1(char[] ops, int[] vars) {
-      throw new UnsupportedOperationException("pendent");
+      int variableMasGrande = -1; // Todas las variables deberían ser iguales o mayores a 0
+      for (int var : vars) {
+        if (var > variableMasGrande) {
+          variableMasGrande = var;
+        }
+      }
+  
+      boolean[] valoresVars = new boolean[variableMasGrande + 1];
+      boolean tautologia = true;
+      boolean contradiccion = true;
+      final int posibilidades = (int) Math.pow(2, valoresVars.length);
+      // Comprueba todas las posibles combinaciones de variables para comprobar si todas son
+      // verdaderas o falsas
+      for (int i = 0; i < posibilidades; i++) {
+        if (funcionProposicional(ops, vars, valoresVars)) {
+          contradiccion = false;
+        } else {
+          tautologia = false;
+        }
+        valoresVars = contadorBinario(valoresVars);
+      }
+  
+      if (tautologia) {
+        return 1;
+      } else if (contradiccion) {
+        return 0;
+      } else {
+        return -1;
+      }
+    }
+
+    // Supone que el numero binario tiene el bit mas significativo a la derecha
+    // Cuando llega al maximo valor de numeroBinario vuelve a empezar en 0
+    private static boolean[] contadorBinario(boolean[] numeroBinario) {
+      int i = 0;
+      int bits = numeroBinario.length;
+      while (i < bits && numeroBinario[i]) {
+        numeroBinario[i] = false;
+        i++;
+      }
+      if (i < bits) {
+        numeroBinario[i] = true;
+      }
+      return numeroBinario;
+    }
+  
+    // Supone que la funcion proposicional se puede resolver de derecha a izquierda
+    private static boolean funcionProposicional(char[] ops, int[] vars, boolean[] valoresVars) {
+      boolean ultimoValor = valoresVars[vars[0]];
+      for (int i = 0; i < ops.length; i++) {
+        switch (ops[i]) {
+          case '∧' ->
+            ultimoValor = ultimoValor && valoresVars[vars[i]];
+          case '∨' ->
+            ultimoValor = ultimoValor || valoresVars[vars[i]];
+          case '→' ->
+            ultimoValor = ultimoValor || (!valoresVars[vars[i]]);
+          case '.' ->
+            ultimoValor = (!ultimoValor) || (!valoresVars[vars[i]]);
+        }
+      }
+      return ultimoValor;
     }
 
     /*
@@ -93,7 +154,20 @@ class Entrega {
      * (∀x : P(x)) <-> (∃!x : Q(x))
      */
     static boolean exercici2(int[] universe, Predicate<Integer> p, Predicate<Integer> q) {
-      throw new UnsupportedOperationException("pendent");
+      int numeroXCumplenP = 0;
+      int numeroXCumplenQ = 0;
+      for (int x : universe) {
+        if (p.test(x)) {
+          numeroXCumplenP++;
+        }
+        if (q.test(x)) {
+          numeroXCumplenQ++;
+        }
+      }
+  
+      boolean primerPredicado = numeroXCumplenP == universe.length; // Se cumple siempre
+      boolean segundoPredicado = numeroXCumplenQ == 1; // Se cumple una vez
+      return primerPredicado == segundoPredicado;
     }
 
     static void tests() {
@@ -147,193 +221,193 @@ class Entrega {
      * Pista: Cercau informació sobre els nombres de Stirling.
      */
     static int exercici1(int[] a) {
-        if(a.length==0){//Caso de conjunto vacio
-            return 1;
-        }else{
-            int sol = 0;
-            for(int i = 0; i <= a.length; i++){//bucle por número elementos del conjunto
-                sol = sol + stirling(a.length,i);
-            }
-            return sol;
+      if (a.length == 0) {//Caso de conjunto vacio
+        return 1;
+      } else {
+        int sol = 0;
+        for (int i = 0; i <= a.length; i++) {//bucle por número elementos del conjunto
+          sol = sol + stirling(a.length, i);
         }
+        return sol;
+      }
     }
-    
-    static int stirling(int x, int y){ //Calculo del numero de stirling
-        if((y == 0)){
-            return 0;
-        }else if((x == y)||(y == 1)){
-            return 1;
-        }else{
-            return y * stirling(x-1,y) + stirling(x-1,y-1);
-        }
+  
+    static int stirling(int x, int y) { //Calculo del numero de stirling
+      if ((y == 0)) {
+        return 0;
+      } else if ((x == y) || (y == 1)) {
+        return 1;
+      } else {
+        return y * stirling(x - 1, y) + stirling(x - 1, y - 1);
+      }
     }
-
+  
     /*
-     * Trobau el cardinal de la relació d'ordre parcial sobre `a` més petita que conté `rel` (si
-     * existeix). En altres paraules, el cardinal de la seva clausura reflexiva, transitiva i
-     * antisimètrica.
-     *
-     * Si no existeix, retornau -1.
+       * Trobau el cardinal de la relació d'ordre parcial sobre `a` més petita que conté `rel` (si
+       * existeix). En altres paraules, el cardinal de la seva clausura reflexiva, transitiva i
+       * antisimètrica.
+       *
+       * Si no existeix, retornau -1.
      */
     static int exercici2(int[] a, int[][] rel) {
-        boolean posible = true;
-        boolean reflexiva = false;
-        boolean transitiva = true;
-        int counter = 0;
-        for(int i = 0; i < a.length; i++){ //Comprueba reflexividad
-            for(int j = 0; j < rel.length; j++){
-                if(rel[j][0]==a[i]&&rel[j][1]==a[i]){
-                    reflexiva = true;
-                }
-            }
-            if(!reflexiva){
-                counter = counter + 1;
-            }
-            reflexiva = false;
+      boolean posible = true;
+      boolean reflexiva = false;
+      boolean transitiva = true;
+      int counter = 0;
+      for (int i = 0; i < a.length; i++) { //Comprueba reflexividad
+        for (int j = 0; j < rel.length; j++) {
+          if (rel[j][0] == a[i] && rel[j][1] == a[i]) {
+            reflexiva = true;
+          }
         }
-        for(int j = 0; j < rel.length; j++){//Comprueba transitividad
-            for(int k = 0; k < rel.length; k++){
-                if(rel[j][1]==rel[k][0]){
-                    transitiva = false;
-                    for(int m = 0; m < rel.length; m++){
-                        if(rel[j][0]==rel[m][0]&&rel[k][1]==rel[m][1]){
-                            transitiva = true;
-                        }
-                    }
-                }
-            }
-            if(!transitiva){
-                counter = counter + 1;
-            }
-            transitiva = true;
+        if (!reflexiva) {
+          counter = counter + 1;
         }
-        for(int j = 0; j < rel.length; j++){//Comprueba antisimetria 
-            for(int k = 0; k < rel.length; k++){
-                if(rel[j][0]==rel[k][1]&&rel[j][1]==rel[k][0]){
-                    if(!(rel[j][0]==rel[j][1])){
-                        posible = false;
-                    }
-                }
+        reflexiva = false;
+      }
+      for (int j = 0; j < rel.length; j++) {//Comprueba transitividad
+        for (int k = 0; k < rel.length; k++) {
+          if (rel[j][1] == rel[k][0]) {
+            transitiva = false;
+            for (int m = 0; m < rel.length; m++) {
+              if (rel[j][0] == rel[m][0] && rel[k][1] == rel[m][1]) {
+                transitiva = true;
+              }
             }
+          }
         }
-        if(posible){
-            return counter + rel.length;
-        }else{
-            return -1;
+        if (!transitiva) {
+          counter = counter + 1;
         }
+        transitiva = true;
+      }
+      for (int j = 0; j < rel.length; j++) {//Comprueba antisimetria 
+        for (int k = 0; k < rel.length; k++) {
+          if (rel[j][0] == rel[k][1] && rel[j][1] == rel[k][0]) {
+            if (!(rel[j][0] == rel[j][1])) {
+              posible = false;
+            }
+          }
+        }
+      }
+      if (posible) {
+        return counter + rel.length;
+      } else {
+        return -1;
+      }
     }
-
+  
     /*
-     * Donada una relació d'ordre parcial `rel` definida sobre `a` i un subconjunt `x` de `a`,
-     * retornau:
-     * - L'ínfim de `x` si existeix i `op` és false
-     * - El suprem de `x` si existeix i `op` és true
-     * - null en qualsevol altre cas
+       * Donada una relació d'ordre parcial `rel` definida sobre `a` i un subconjunt `x` de `a`,
+       * retornau:
+       * - L'ínfim de `x` si existeix i `op` és false
+       * - El suprem de `x` si existeix i `op` és true
+       * - null en qualsevol altre cas
      */
     static Integer exercici3(int[] a, int[][] rel, int[] x, boolean op) {
-        if(!op){
-            boolean isMin = true;
-            boolean isInfim = false;
-            for (int i = 0; i<rel.length; i++){
-                for(int j = 0; j<rel.length; j++){
-                   if(rel[i][1]==rel[j][0]&&rel[i][0]!=rel[i][1]){
-                       isMin = false;
-                   } 
-                }
-                if(isMin){
-                    for(int j = 0; j<x.length;j++){
-                        if(!(rel[i][0]==x[j])){
-                            isInfim = true;
-                        }
-                    }
-                }
-                if(isInfim){
-                    return rel[i][1];
-                }
+      if (!op) {
+        boolean isMin = true;
+        boolean isInfim = false;
+        for (int i = 0; i < rel.length; i++) {
+          for (int j = 0; j < rel.length; j++) {
+            if (rel[i][1] == rel[j][0] && rel[i][0] != rel[i][1]) {
+              isMin = false;
             }
-        }else{
-            boolean isMax = true;
-            boolean isSuprem = false;
-            for (int i = 0; i<rel.length; i++){
-                for(int j = 0; j<rel.length; j++){
-                   if(rel[i][0]==rel[j][1]){
-                       isMax = false;
-                   } 
-                }
-                if(isMax){
-                    for(int j = 0; j<x.length;j++){
-                        if(rel[i][1]==x[j]){
-                            isSuprem = true;
-                        }
-                    }
-                }
-                if(isSuprem){
-                    return rel[i][0];
-                }
+          }
+          if (isMin) {
+            for (int j = 0; j < x.length; j++) {
+              if (!(rel[i][0] == x[j])) {
+                isInfim = true;
+              }
             }
+          }
+          if (isInfim) {
+            return rel[i][1];
+          }
         }
-        return null;
+      } else {
+        boolean isMax = true;
+        boolean isSuprem = false;
+        for (int i = 0; i < rel.length; i++) {
+          for (int j = 0; j < rel.length; j++) {
+            if (rel[i][0] == rel[j][1]) {
+              isMax = false;
+            }
+          }
+          if (isMax) {
+            for (int j = 0; j < x.length; j++) {
+              if (rel[i][1] == x[j]) {
+                isSuprem = true;
+              }
+            }
+          }
+          if (isSuprem) {
+            return rel[i][0];
+          }
+        }
+      }
+      return null;
     }
-
+  
     /*
-     * Donada una funció `f` de `a` a `b`, retornau:
-     *  - El graf de la seva inversa (si existeix)
-     *  - Sinó, el graf d'una inversa seva per l'esquerra (si existeix)
-     *  - Sinó, el graf d'una inversa seva per la dreta (si existeix)
-     *  - Sinó, null.
+       * Donada una funció `f` de `a` a `b`, retornau:
+       *  - El graf de la seva inversa (si existeix)
+       *  - Sinó, el graf d'una inversa seva per l'esquerra (si existeix)
+       *  - Sinó, el graf d'una inversa seva per la dreta (si existeix)
+       *  - Sinó, null.
      */
     static int[][] exercici4(int[] a, int[] b, Function<Integer, Integer> f) {
       boolean inyectiva = true;
       boolean exaustiva = true;
       int[] temp = new int[a.length];
-      for(int i = 1;i<a.length;i++){
-          temp[i] = f.apply(a[i]);
-      }    
-      for(int i = 0; i<temp.length;i++){
-          boolean temp1 = true;
-          for(int j = i + 1; j<temp.length;j++){
-              if(temp[i]==temp[j]){
-                  temp1 = false;
-              }
-          }
-          if(!(temp1)){
-              inyectiva = false;
-          }
+      for (int i = 1; i < a.length; i++) {
+        temp[i] = f.apply(a[i]);
       }
-      boolean temp1 = false;
-      for(int i = 0; i<b.length;i++){
-          for(int j = i + 1; j<temp.length;j++){
-              if(b[i]==temp[j]){
-                  temp1 = true;
-              }
+      for (int i = 0; i < temp.length; i++) {
+        boolean temp1 = true;
+        for (int j = i + 1; j < temp.length; j++) {
+          if (temp[i] == temp[j]) {
+            temp1 = false;
           }
-        if(!(temp1)){
-            exaustiva = false;
+        }
+        if (!(temp1)) {
+          inyectiva = false;
         }
       }
-      if(exaustiva && inyectiva){
-          int[][]grafoInvertido = new int[a.length][2];
-          for(int i = 0; i<grafoInvertido.length;i++){
-              grafoInvertido[i][0] = temp[i];
-              grafoInvertido[i][1] = a[i];
+      boolean temp1 = false;
+      for (int i = 0; i < b.length; i++) {
+        for (int j = i + 1; j < temp.length; j++) {
+          if (b[i] == temp[j]) {
+            temp1 = true;
           }
-          return grafoInvertido;
+        }
+        if (!(temp1)) {
+          exaustiva = false;
+        }
       }
-      if(inyectiva){
-          int[][]grafoInvertido = new int[b.length][2];
-          for(int i = 0; i<grafoInvertido.length;i++){
-              grafoInvertido[i][0] = b[i];
-              grafoInvertido[i][1] = b[i]; //Función contraria a x -> x
-          }
-          return grafoInvertido;
+      if (exaustiva && inyectiva) {
+        int[][] grafoInvertido = new int[a.length][2];
+        for (int i = 0; i < grafoInvertido.length; i++) {
+          grafoInvertido[i][0] = temp[i];
+          grafoInvertido[i][1] = a[i];
+        }
+        return grafoInvertido;
       }
-      if(exaustiva){
-          int[][]grafoInvertido = new int[b.length][2];
-          for(int i = 0; i<grafoInvertido.length;i++){
-              grafoInvertido[i][0] = b[i];
-              grafoInvertido[i][1] = b[i]*2; //Función contraria a x -> x/2
-          }
-          return grafoInvertido;
+      if (inyectiva) {
+        int[][] grafoInvertido = new int[b.length][2];
+        for (int i = 0; i < grafoInvertido.length; i++) {
+          grafoInvertido[i][0] = b[i];
+          grafoInvertido[i][1] = b[i]; //Función contraria a x -> x
+        }
+        return grafoInvertido;
+      }
+      if (exaustiva) {
+        int[][] grafoInvertido = new int[b.length][2];
+        for (int i = 0; i < grafoInvertido.length; i++) {
+          grafoInvertido[i][0] = b[i];
+          grafoInvertido[i][1] = b[i] * 2; //Función contraria a x -> x/2
+        }
+        return grafoInvertido;
       }
       return null;
     }
@@ -518,9 +592,109 @@ class Entrega {
      * Si és impossible, retornau -1.
      */
     static int exercici4(char[][] mapa) {
-      throw new UnsupportedOperationException("pendent");
+      int[][] grafo = convertirEnGrafo(mapa);
+      // Devuelve un array de los vertices adjacentes de cada vertice con 'O' el primero y 
+      // 'D' el segundo
+      final int numVertices = grafo.length;
+      final int indiceOrigen = 0;
+      final int indiceDestino = 1;
+  
+      boolean[] visitados = new boolean[numVertices];
+      int[] distancias = new int[numVertices];
+      for (int i = 0; i < numVertices; i++) {
+        visitados[i] = false;
+        distancias[i] = Integer.MAX_VALUE;
+      }
+      distancias[indiceOrigen] = 0;
+  
+      int verticeVisitado;
+      int distanciaTentativa;
+      for (int i = 0; i < numVertices; i++) {
+        verticeVisitado = verticeMasCercanoNoVisitado(distancias, visitados);
+        distanciaTentativa = distancias[verticeVisitado] + 1;
+        for (int verticeAdjacente : grafo[verticeVisitado]) {
+          // Si es -1 significa que no hay vertice adjacente
+          if (verticeAdjacente != -1 && distanciaTentativa < distancias[verticeAdjacente]) {
+            distancias[verticeAdjacente] = distanciaTentativa;
+          }
+        }
+        visitados[verticeVisitado] = true;
+      }
+  
+      if (distancias[1] < Integer.MAX_VALUE) {
+        return distancias[indiceDestino];
+      } else {
+        return -1; // El laberinto no e puede resolver
+      }
     }
 
+    private static int[][] convertirEnGrafo(char[][] mapa) {
+      int[][] mapaEnteros = new int[mapa.length][mapa[0].length];
+      final int indiceOrigen = 0;
+      final int indiceDestino = 1;
+      // Añadir constante de -1
+      int numeroVertices = 2;
+      for (int i = 0; i < mapa.length; i++) {
+        for (int j = 0; j < mapa[i].length; j++) {
+          if (mapa[i][j] == 'O') {
+            mapaEnteros[i][j] = indiceOrigen;
+          } else if (mapa[i][j] == 'D') {
+            mapaEnteros[i][j] = indiceDestino;
+          } else if (mapa[i][j] == ' ') {
+            mapaEnteros[i][j] = numeroVertices;
+            numeroVertices++;
+          } else if (mapa[i][j] == '#') {
+            mapaEnteros[i][j] = -1;
+          }
+        }
+      }
+  
+      int[][] grafo = new int[numeroVertices][4];
+      for (int i = 0; i < mapa.length; i++) {
+        for (int j = 0; j < mapa[i].length; j++) {
+          if (mapa[i][j] != '#') {
+            int[] verticesAdjacentes = new int[4];
+            if (i == 0) {
+              verticesAdjacentes[0] = -1;
+            } else {
+              verticesAdjacentes[0] = mapaEnteros[i - 1][j];
+            }
+            if (j == 0) {
+              verticesAdjacentes[1] = -1;
+            } else {
+              verticesAdjacentes[1] = mapaEnteros[i][j - 1];
+            }
+            if (i == mapaEnteros.length - 1) {
+              verticesAdjacentes[2] = -1;
+            } else {
+              verticesAdjacentes[2] = mapaEnteros[i + 1][j];
+            }
+            if (j == mapaEnteros[i].length - 1) {
+              verticesAdjacentes[3] = -1;
+            } else {
+              verticesAdjacentes[3] = mapaEnteros[i][j + 1];
+            }
+            grafo[mapaEnteros[i][j]] = verticesAdjacentes;
+          }
+        }
+      }
+  
+      return grafo;
+    }
+
+    private static int verticeMasCercanoNoVisitado(int[] distancias, boolean[] visitados) {
+      int verticeMasPequeño = 0; // Deja el primer vertice si no encuentra ninguno
+      // Así, si hay una parte aislada, el programa se queda en el vertice 0
+      int distanciaMasPequeña = Integer.MAX_VALUE;
+      for (int i = 0; i < distancias.length; i++) {
+        if (distancias[i] < distanciaMasPequeña && !visitados[i]) {
+          verticeMasPequeño = i;
+          distanciaMasPequeña = distancias[i];
+        }
+      }
+      return verticeMasPequeño;
+    }
+    
     /*
      * Aquí teniu alguns exemples i proves relacionades amb aquests exercicis (vegeu `main`)
      */
@@ -598,7 +772,35 @@ class Entrega {
      * Pista: https://en.wikipedia.org/wiki/Exponentiation_by_squaring
      */
     static int[] exercici1(String msg, int n, int e) {
-      throw new UnsupportedOperationException("pendent");
+      byte[][] parejas = extraeBloquesBytes(msg.getBytes(), 2);
+      int[] mensajeCifrado = new int[parejas.length];
+      final int numeroPosiblesCaracteres = 128; // Byte puede arrojar 128 caracteres diferentes
+      for (int i = 0; i < parejas.length; i++) {
+        int m = parejas[i][0] * numeroPosiblesCaracteres + parejas[i][1];
+        mensajeCifrado[i] = calcularExponenteModN(m, e, n); // Calcula m^e mod n
+      }
+      return mensajeCifrado;
+    }
+
+    private static byte[][] extraeBloquesBytes(byte[] bytes, int n) {
+      byte[][] bloques = new byte[bytes.length / n][n];
+      for (int i = 0; i < bloques.length; i++) {
+        for (int j = 0; j < n; j++) {
+          bloques[i][j] = bytes[i * n + j];
+        }
+      }
+      return bloques;
+    }
+
+    private static int calcularExponenteModN(int m, int e, int n) {
+      if (1 == e) {
+        return m % n;
+      } else if (e % 2 == 0) {
+        int mitadExponente = calcularExponenteModN(m, e / 2, n);
+        return (mitadExponente * mitadExponente) % n;
+      } else { // Si es impar
+        return (calcularExponenteModN(m, e - 1, n) * m) % n;
+      }
     }
 
     /*
